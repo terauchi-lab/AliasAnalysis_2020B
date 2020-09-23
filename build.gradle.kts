@@ -13,7 +13,8 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    antlr("org.antlr:antlr4:4.7")
+    antlr("org.antlr:antlr4:4.7.2")
+    implementation("org.antlr:antlr4-runtime:4.7.2")
 }
 
 application {

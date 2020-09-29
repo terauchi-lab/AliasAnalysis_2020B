@@ -10,8 +10,8 @@ $ ./gradlew generateGrammarSource
 ```
 ### windows
 ```
-$ gradlew.bat
-$ gradlew.bat generateGrammarSource
+$ gradlew
+$ gradlew generateGrammarSource
 ```
 
 ## run
@@ -21,5 +21,5 @@ $ ./gradlew run --args="<filename>"
 ```
 ### windows
 ```
-$ gradlew.bat run --args="<filename>"
+$ gradlew run --args="<filename>"
 ```

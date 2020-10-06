@@ -1,1 +1,1 @@
-src/main/antlr/* linguist-documentation
+*.g4 linguist-documentation

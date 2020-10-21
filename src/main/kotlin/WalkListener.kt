@@ -17,4 +17,24 @@ class WalkListener: ClangBaseListener() {
         super.enterAssignmentExpression(ctx)
         println("assign")
     }
+
+    override fun exitBlockItem(ctx: ClangParser.BlockItemContext?) {
+        super.exitBlockItem(ctx)
+        println("exit block")
+    }
+
+    override fun exitAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
+        super.exitAssignmentExpression(ctx)
+        println("exit assign")
+    }
+
+    override fun enterPointer(ctx: ClangParser.PointerContext?) {
+        super.enterPointer(ctx)
+        println("pointer")
+    }
+
+    override fun exitPointer(ctx: ClangParser.PointerContext?) {
+        super.exitPointer(ctx)
+        println("exit pointer")
+    }
 }

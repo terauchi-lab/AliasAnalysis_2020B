@@ -1,5 +1,7 @@
 int main(){
-    int a=1;
-    int b=a*2;
-    printf("%d\n",a+b);
+    int a,b,p,q,r;
+    p = &a;
+    q = p;
+    p = &b;
+    r = p;
 }

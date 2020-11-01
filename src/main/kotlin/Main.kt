@@ -9,7 +9,13 @@ fun main(args: Array<String>) {
     val lexer = ClangLexer(CharStreams.fromFileName(args.first()))
     val tokenStream = CommonTokenStream(lexer)
     val parser = ClangParser(tokenStream)
+
+    val funcs = mutableListOf<Function>()
     val tree = parser.compilationUnit()
-    val listener = WalkListener()
-    ParseTreeWalker.DEFAULT.walk(listener,tree)
+    val listener = WalkListener(funcs)
+    ParseTreeWalker.DEFAULT.walk(listener, tree)
+
+    funcs.forEach {
+        it.print()
+    }
 }

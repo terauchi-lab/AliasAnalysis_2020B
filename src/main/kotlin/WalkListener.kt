@@ -2,7 +2,7 @@ import clang.ClangBaseListener
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class WalkListener : ClangBaseListener() {
+class WalkListener(val funcs: MutableList<Function>) : ClangBaseListener() {
     override fun visitTerminal(node: TerminalNode?) {
         super.visitTerminal(node)
         println(node?.symbol)
@@ -26,6 +26,8 @@ class WalkListener : ClangBaseListener() {
     override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {
         super.enterExternalDeclaration(ctx)
         println("external")
-        println(ctx?.functionDefinition()?.declarator()?.directDeclarator()?.directDeclarator()?.text)
+        ctx?.functionDefinition()?.declarator()?.directDeclarator()?.directDeclarator()?.text?.let {
+            funcs.add(Function(it))
+        }
     }
 }

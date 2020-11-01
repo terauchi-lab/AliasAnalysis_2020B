@@ -1,3 +1,7 @@
+void sub(){
+    int a,d;
+}
+
 int main(){
     int a,b,p,q,r;
     p = &a;

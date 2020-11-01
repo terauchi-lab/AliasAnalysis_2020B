@@ -2,39 +2,30 @@ import clang.ClangBaseListener
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class WalkListener: ClangBaseListener() {
+class WalkListener : ClangBaseListener() {
     override fun visitTerminal(node: TerminalNode?) {
         super.visitTerminal(node)
         println(node?.symbol)
     }
 
-    override fun enterBlockItem(ctx: ClangParser.BlockItemContext?) {
-        super.enterBlockItem(ctx)
-        println("block")
-    }
-
     override fun enterAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
         super.enterAssignmentExpression(ctx)
         println("assign")
+        ctx?.children?.forEach {
+            print(it.text)
+        }
+        println()
     }
 
-    override fun exitBlockItem(ctx: ClangParser.BlockItemContext?) {
-        super.exitBlockItem(ctx)
-        println("exit block")
+    override fun enterInitDeclaratorList(ctx: ClangParser.InitDeclaratorListContext?) {
+        super.enterInitDeclaratorList(ctx)
+        println("init")
+        println(ctx?.children?.map { it.text })
     }
 
-    override fun exitAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
-        super.exitAssignmentExpression(ctx)
-        println("exit assign")
-    }
-
-    override fun enterPointer(ctx: ClangParser.PointerContext?) {
-        super.enterPointer(ctx)
-        println("pointer")
-    }
-
-    override fun exitPointer(ctx: ClangParser.PointerContext?) {
-        super.exitPointer(ctx)
-        println("exit pointer")
+    override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {
+        super.enterExternalDeclaration(ctx)
+        println("external")
+        println(ctx?.functionDefinition()?.declarator()?.directDeclarator()?.directDeclarator()?.text)
     }
 }

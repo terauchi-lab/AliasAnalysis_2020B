@@ -16,6 +16,7 @@ fun main(args: Array<String>) {
     ParseTreeWalker.DEFAULT.walk(listener, tree)
 
     funcs.forEach {
+        it.initPointers()
         it.print()
     }
 }

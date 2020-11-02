@@ -1,8 +1,7 @@
 import clang.ClangParser
-import org.antlr.v4.runtime.tree.ParseTree
 
 class Function(val name: String) {
-    val variables = mutableSetOf<ParseTree>()
+    val variables = mutableSetOf<ClangParser.DirectDeclaratorContext>()
     val expressions = mutableListOf<ClangParser.AssignmentExpressionContext>()
 
     fun print() {

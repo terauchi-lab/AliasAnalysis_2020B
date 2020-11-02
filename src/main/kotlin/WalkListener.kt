@@ -17,8 +17,7 @@ class WalkListener(val funcs: MutableList<Function>) : ClangBaseListener() {
 
     override fun enterInitDeclaratorList(ctx: ClangParser.InitDeclaratorListContext?) {
         super.enterInitDeclaratorList(ctx)
-        funcs.last().variables.addAll(ctx?.children ?: emptyList())
-        ctx?.children?.map { it.toString() }.let { println(it) }
+        ctx?.initDeclarator()?.declarator()?.directDeclarator()?.let { funcs.last().variables.add(it) }
     }
 
     override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {

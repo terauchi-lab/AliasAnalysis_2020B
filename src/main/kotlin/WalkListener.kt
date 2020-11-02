@@ -10,22 +10,19 @@ class WalkListener(val funcs: MutableList<Function>) : ClangBaseListener() {
 
     override fun enterAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
         super.enterAssignmentExpression(ctx)
-        println("assign")
-        ctx?.children?.forEach {
-            print(it.text)
-        }
-        println()
+        if (ctx?.assignmentOperator()?.text == "=")
+            funcs.last().expressions.add(ctx)
+        ctx?.unaryExpression()?.postfixExpression()?.primaryExpression()?.Identifier().let { println(it) }
     }
 
     override fun enterInitDeclaratorList(ctx: ClangParser.InitDeclaratorListContext?) {
         super.enterInitDeclaratorList(ctx)
-        println("init")
-        println(ctx?.children?.map { it.text })
+        funcs.last().variables.addAll(ctx?.children ?: emptyList())
+        ctx?.children?.map { it.toString() }.let { println(it) }
     }
 
     override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {
         super.enterExternalDeclaration(ctx)
-        println("external")
         ctx?.functionDefinition()?.declarator()?.directDeclarator()?.directDeclarator()?.text?.let {
             funcs.add(Function(it))
         }

@@ -12,13 +12,19 @@ class Function(val name: String) {
         }
     }
 
+    fun checkExpr(){
+        expressions.forEach {
+            
+        }
+    }
+
     fun print() {
         println(name)
-        variables.forEach {
-            println("\t${it.text}")
-        }
         expressions.forEach {
             println("\t${it.text}")
+        }
+        pointers.forEach {
+            println("\t${it.first.text}:${it.second.map { context -> context.text }}")
         }
     }
 }

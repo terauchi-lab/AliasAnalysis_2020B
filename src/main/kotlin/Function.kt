@@ -8,7 +8,7 @@ class Function(val name: String) {
             mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
 
     fun initPointers() {
-        variables.forEach {
+        variables.reversed().forEach {
             pointers.add(Pair(it, mutableSetOf()))
         }
     }
@@ -37,7 +37,11 @@ class Function(val name: String) {
                             null -> {
                                 //a=b;
                                 if (it.unaryExpression()?.unaryOperator() == null) {
-
+                                    pointers.find { p ->
+                                        p.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    }?.second?.addAll(pointers.find { p ->
+                                        p.first.text == c.postfixExpression().primaryExpression().Identifier().text
+                                    }?.second ?: emptySet())
                                 }
                                 //*a=b;
                                 if (it.unaryExpression()?.unaryOperator()?.text == "*") {

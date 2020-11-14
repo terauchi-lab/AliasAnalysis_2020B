@@ -56,7 +56,14 @@ class Function(val name: String) {
                                 }
                                 //*a=b;
                                 if (it.unaryExpression()?.unaryOperator()?.text == "*") {
-
+                                    val bpts = pointers.find { p ->
+                                        p.first.text == c.postfixExpression().primaryExpression().Identifier().text
+                                    }?.second ?: emptySet()
+                                    pointers.find { p ->
+                                        p.first.text == it.unaryExpression().castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    }?.second?.forEach { t ->
+                                        pointers.find { p -> p.first.text == t.text }?.second?.addAll(bpts)
+                                    }
                                 }
                             }
                         }

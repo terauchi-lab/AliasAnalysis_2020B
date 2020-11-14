@@ -31,7 +31,18 @@ class Function(val name: String) {
                             "*" -> {
                                 //a=*b;
                                 if (it.unaryExpression()?.unaryOperator() == null) {
-
+                                    pointers.find { p ->
+                                        p.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    }?.second?.addAll(pointers.find { p ->
+                                        p.first.text == c.castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    }?.second?.run {
+                                        val set = mutableSetOf<TerminalNode>()
+                                        forEach { t ->
+                                            set.addAll(pointers.find { p -> p.first.text == t.text }?.second
+                                                    ?: emptySet())
+                                        }
+                                        set
+                                    } ?: emptySet())
                                 }
                             }
                             null -> {

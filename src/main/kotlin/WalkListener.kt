@@ -1,8 +1,7 @@
 import clang.ClangBaseListener
 import clang.ClangParser
-import org.antlr.v4.runtime.tree.TerminalNode
 
-class WalkListener(val funcs: MutableList<Function>) : ClangBaseListener() {
+class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener() {
     override fun enterAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
         super.enterAssignmentExpression(ctx)
         if (ctx?.assignmentOperator()?.text == "=")

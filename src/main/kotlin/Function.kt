@@ -1,15 +1,16 @@
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class Function(val name: String) {
+class Function(private val name: String) {
     val variables = mutableSetOf<TerminalNode>()
     val expressions = mutableListOf<ClangParser.AssignmentExpressionContext>()
-    val pointers =
-            mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
+    val pointers = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
+    private val edges = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
 
     fun initPointers() {
         variables.reversed().forEach {
             pointers.add(Pair(it, mutableSetOf()))
+            edges.add(Pair(it, mutableSetOf()))
         }
     }
 
@@ -68,6 +69,18 @@ class Function(val name: String) {
                             }
                         }
                     }
+        }
+    }
+
+    private fun updatePts() {
+        edges.forEach {
+            it.second.forEach { s ->
+                pointers.find { p ->
+                    p.first.text == it.first.text
+                }?.second?.addAll(pointers.find { p ->
+                    p.first.text == s.text
+                }?.second ?: emptySet())
+            }
         }
     }
 

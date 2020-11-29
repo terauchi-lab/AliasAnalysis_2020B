@@ -32,44 +32,34 @@ class Function(private val name: String) {
                             "*" -> {
                                 //a=*b;
                                 if (it.unaryExpression()?.unaryOperator() == null) {
-                                    pointers.find { p ->
-                                        p.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    edges.find { e ->
+                                        e.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
                                     }?.second?.addAll(pointers.find { p ->
                                         p.first.text == c.castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second?.run {
-                                        val set = mutableSetOf<TerminalNode>()
-                                        forEach { t ->
-                                            set.addAll(pointers.find { p -> p.first.text == t.text }?.second
-                                                    ?: emptySet())
-                                        }
-                                        set
-                                    } ?: emptySet())
+                                    }?.second ?: emptySet())
                                 }
                             }
                             null -> {
                                 //a=b;
                                 if (it.unaryExpression()?.unaryOperator() == null) {
-                                    pointers.find { p ->
-                                        p.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second?.addAll(pointers.find { p ->
-                                        p.first.text == c.postfixExpression().primaryExpression().Identifier().text
-                                    }?.second ?: emptySet())
+                                    edges.find { e ->
+                                        e.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    }?.second?.add(c.postfixExpression().primaryExpression().Identifier())
                                 }
                                 //*a=b;
                                 if (it.unaryExpression()?.unaryOperator()?.text == "*") {
-                                    val bpts = pointers.find { p ->
-                                        p.first.text == c.postfixExpression().primaryExpression().Identifier().text
-                                    }?.second ?: emptySet()
                                     pointers.find { p ->
                                         p.first.text == it.unaryExpression().castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier().text
                                     }?.second?.forEach { t ->
-                                        pointers.find { p -> p.first.text == t.text }?.second?.addAll(bpts)
+                                        edges.find { e -> e.first.text == t.text }?.second?.add(c.postfixExpression().primaryExpression().Identifier())
                                     }
                                 }
                             }
                         }
                     }
+            updatePts()
         }
+        updatePts()
     }
 
     private fun updatePts() {

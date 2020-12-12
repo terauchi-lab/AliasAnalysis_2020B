@@ -90,6 +90,9 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
         expressions.forEach {
             println("\t${it.text}")
         }
+        calls.forEach {
+            println("\t$it")
+        }
         pointers.forEach {
             println("\t${it.first.text}:${it.second}")
         }

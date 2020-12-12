@@ -29,7 +29,7 @@ class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener
                 list.add(arg.assignmentExpression())
                 arg = arg.argumentExpressionList()
             }
-            funcs.last().calls.add(Call(it.text, list))
+            funcs.last().calls.add(Call(it.text, list.reversed()))
         }
     }
 }

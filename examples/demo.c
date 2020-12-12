@@ -1,4 +1,4 @@
-void sub(int x){
+void sub(int *x){
     int a,d;
 }
 
@@ -8,5 +8,5 @@ int main(){
     q = p;
     p = &b;
     r = p;
-    sub(r);
+    sub(&r);
 }

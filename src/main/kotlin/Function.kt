@@ -4,7 +4,8 @@ import org.antlr.v4.runtime.tree.TerminalNode
 class Function(private val name: String) {
     val variables = mutableSetOf<TerminalNode>()
     val expressions = mutableListOf<ClangParser.AssignmentExpressionContext>()
-    val pointers = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
+    val calls = mutableListOf<Call>()
+    private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
     private val edges = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
 
     fun initPointers() {
@@ -17,46 +18,56 @@ class Function(private val name: String) {
     fun checkExpr() {
         expressions.forEach {
             it.assignmentExpression().conditionalExpression().logicalOrExpression().logicalAndExpression()
-                    .inclusiveOrExpression().exclusiveOrExpression().andExpression().equalityExpression()
-                    .relationalExpression().shiftExpression().additiveExpression()
-                    .multiplicativeExpression().castExpression().unaryExpression().let { c ->
-                        when (c.unaryOperator()?.text) {
-                            "&" -> {
-                                //a=&b;
-                                if (it.unaryExpression()?.unaryOperator() == null) {
-                                    pointers.find { p ->
-                                        p.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second?.add(c.castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier())
-                                }
+                .inclusiveOrExpression().exclusiveOrExpression().andExpression().equalityExpression()
+                .relationalExpression().shiftExpression().additiveExpression()
+                .multiplicativeExpression().castExpression().unaryExpression().let { c ->
+                    when (c.unaryOperator()?.text) {
+                        "&" -> {
+                            //a=&b;
+                            if (it.unaryExpression()?.unaryOperator() == null) {
+                                pointers.find { p ->
+                                    p.first.text == it.unaryExpression().postfixExpression().primaryExpression()
+                                        .Identifier().text
+                                }?.second?.add(
+                                    c.castExpression().unaryExpression().postfixExpression().primaryExpression()
+                                        .Identifier()
+                                )
                             }
-                            "*" -> {
-                                //a=*b;
-                                if (it.unaryExpression()?.unaryOperator() == null) {
-                                    edges.find { e ->
-                                        e.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second?.addAll(pointers.find { p ->
-                                        p.first.text == c.castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second ?: emptySet())
-                                }
+                        }
+                        "*" -> {
+                            //a=*b;
+                            if (it.unaryExpression()?.unaryOperator() == null) {
+                                edges.find { e ->
+                                    e.first.text == it.unaryExpression().postfixExpression().primaryExpression()
+                                        .Identifier().text
+                                }?.second?.addAll(pointers.find { p ->
+                                    p.first.text == c.castExpression().unaryExpression().postfixExpression()
+                                        .primaryExpression().Identifier().text
+                                }?.second ?: emptySet())
                             }
-                            null -> {
-                                //a=b;
-                                if (it.unaryExpression()?.unaryOperator() == null) {
-                                    edges.find { e ->
-                                        e.first.text == it.unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second?.add(c.postfixExpression().primaryExpression().Identifier())
-                                }
-                                //*a=b;
-                                if (it.unaryExpression()?.unaryOperator()?.text == "*") {
-                                    pointers.find { p ->
-                                        p.first.text == it.unaryExpression().castExpression().unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    }?.second?.forEach { t ->
-                                        edges.find { e -> e.first.text == t.text }?.second?.add(c.postfixExpression().primaryExpression().Identifier())
-                                    }
+                        }
+                        null -> {
+                            //a=b;
+                            if (it.unaryExpression()?.unaryOperator() == null) {
+                                edges.find { e ->
+                                    e.first.text == it.unaryExpression().postfixExpression().primaryExpression()
+                                        .Identifier().text
+                                }?.second?.add(c.postfixExpression().primaryExpression().Identifier())
+                            }
+                            //*a=b;
+                            if (it.unaryExpression()?.unaryOperator()?.text == "*") {
+                                pointers.find { p ->
+                                    p.first.text == it.unaryExpression().castExpression().unaryExpression()
+                                        .postfixExpression().primaryExpression().Identifier().text
+                                }?.second?.forEach { t ->
+                                    edges.find { e -> e.first.text == t.text }?.second?.add(
+                                        c.postfixExpression().primaryExpression().Identifier()
+                                    )
                                 }
                             }
                         }
                     }
+                }
             updatePts()
         }
         updatePts()

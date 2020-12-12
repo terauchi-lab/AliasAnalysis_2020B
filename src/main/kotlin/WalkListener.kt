@@ -22,7 +22,14 @@ class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener
 
     override fun enterPostfixExpression(ctx: ClangParser.PostfixExpressionContext?) {
         super.enterPostfixExpression(ctx)
-        ctx?.postfixExpression()?.primaryExpression()?.let { println(it.Identifier()) }
-        println(ctx?.argumentExpressionList()?.text)
+        ctx?.postfixExpression()?.primaryExpression()?.Identifier()?.let {
+            val list = mutableListOf<ClangParser.AssignmentExpressionContext>()
+            var arg = ctx.argumentExpressionList()
+            while (arg != null) {
+                list.add(arg.assignmentExpression())
+                arg = arg.argumentExpressionList()
+            }
+            funcs.last().calls.add(Call(it.text, list))
+        }
     }
 }

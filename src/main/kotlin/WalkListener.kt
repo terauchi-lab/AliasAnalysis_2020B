@@ -1,5 +1,6 @@
 import clang.ClangBaseListener
 import clang.ClangParser
+import org.antlr.v4.runtime.tree.TerminalNode
 
 class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener() {
     override fun enterAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
@@ -15,8 +16,21 @@ class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener
 
     override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {
         super.enterExternalDeclaration(ctx)
-        ctx?.functionDefinition()?.declarator()?.directDeclarator()?.directDeclarator()?.text?.let {
-            funcs.add(Function(it))
+        ctx?.functionDefinition()?.declarator()?.directDeclarator()?.directDeclarator()?.Identifier()?.let {
+            val list = mutableListOf<Pair<Boolean, TerminalNode>>()
+            var arg = ctx.functionDefinition()?.declarator()?.directDeclarator()?.parameterTypeList()?.parameterList()
+            while (arg != null) {
+                list.add(
+                    arg.parameterDeclaration().run {
+                        Pair(
+                            declarationSpecifiers().declarationSpecifier().first().typeSpecifier()
+                                .pointer().text == "*",
+                            declarator().directDeclarator().Identifier()
+                        )
+                    })
+                arg = arg.parameterList()
+            }
+            funcs.add(Function(it.text, list.reversed()))
         }
     }
 

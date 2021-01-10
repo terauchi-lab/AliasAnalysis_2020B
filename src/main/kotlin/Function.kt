@@ -9,6 +9,10 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
     private val edges = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
 
     fun initPointers() {
+        args.filter { it.first }.forEach {
+            pointers.add(Pair(it.second, mutableSetOf()))
+            edges.add(Pair(it.second, mutableSetOf()))
+        }
         variables.reversed().forEach {
             pointers.add(Pair(it, mutableSetOf()))
             edges.add(Pair(it, mutableSetOf()))

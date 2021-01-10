@@ -24,7 +24,7 @@ class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener
                     arg.parameterDeclaration().run {
                         Pair(
                             declarationSpecifiers().declarationSpecifier().first().typeSpecifier()
-                                .pointer().text == "*",
+                                .pointer()?.text == "*",
                             declarator().directDeclarator().Identifier()
                         )
                     })

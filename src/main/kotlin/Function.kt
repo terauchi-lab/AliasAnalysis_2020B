@@ -1,14 +1,13 @@
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
+class Function(private val name: String, private val args: List<Pair<Boolean, TerminalNode>>) {
     val variables = mutableSetOf<TerminalNode>()
     val expressions = mutableListOf<ClangParser.AssignmentExpressionContext>()
     val calls = mutableListOf<Call>()
-    private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
-    private val edges = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
-    val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, TerminalNode>>>>()
-
+    private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<String>>>()
+    private val edges = mutableListOf<Pair<TerminalNode, MutableSet<String>>>()
+    private val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, String>>>>()
 
     fun initPointers() {
         args.filter { it.first }.forEach {
@@ -37,7 +36,7 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
                                         .Identifier().text
                                 }?.second?.add(
                                     c.castExpression().unaryExpression().postfixExpression().primaryExpression()
-                                        .Identifier()
+                                        .Identifier().text
                                 )
                             }
                         }
@@ -59,7 +58,7 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
                                 edges.find { e ->
                                     e.first.text == it.unaryExpression().postfixExpression().primaryExpression()
                                         .Identifier().text
-                                }?.second?.add(c.postfixExpression().primaryExpression().Identifier())
+                                }?.second?.add(c.postfixExpression().primaryExpression().Identifier().text)
                             }
                             //*a=b;
                             if (it.unaryExpression()?.unaryOperator()?.text == "*") {
@@ -67,8 +66,8 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
                                     p.first.text == it.unaryExpression().castExpression().unaryExpression()
                                         .postfixExpression().primaryExpression().Identifier().text
                                 }?.second?.forEach { t ->
-                                    edges.find { e -> e.first.text == t.text }?.second?.add(
-                                        c.postfixExpression().primaryExpression().Identifier()
+                                    edges.find { e -> e.first.text == t }?.second?.add(
+                                        c.postfixExpression().primaryExpression().Identifier().text
                                     )
                                 }
                             }
@@ -92,7 +91,7 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
                                 .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression().andExpression()
                                 .equalityExpression().relationalExpression().shiftExpression().additiveExpression()
                                 .multiplicativeExpression().castExpression().unaryExpression().castExpression()
-                                .unaryExpression().postfixExpression().primaryExpression().Identifier()
+                                .unaryExpression().postfixExpression().primaryExpression().Identifier().text
                         )
                     )
                 }
@@ -106,7 +105,7 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
                 pointers.find { p ->
                     p.first.text == it.first.text
                 }?.second?.addAll(pointers.find { p ->
-                    p.first.text == s.text
+                    p.first.text == s
                 }?.second ?: emptySet())
             }
         }
@@ -116,9 +115,9 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
         callEdges.forEach {
             pointers.find { p -> p.first.text == it.first.text }?.let { p ->
                 it.second.forEach { s ->
-                    p.second.add(s.second)
+                    p.second.add("${s.first}.${s.second}")
                     p.second.addAll(
-                        functions.find { f -> f.name == s.first }?.pointers?.find { fp -> fp.first.text == s.second.text }?.second
+                        functions.find { f -> f.name == s.first }?.pointers?.find { fp -> fp.first.text == s.second }?.second?.map { m -> "${s.first}.$m" }
                             ?: emptySet()
                     )
                 }

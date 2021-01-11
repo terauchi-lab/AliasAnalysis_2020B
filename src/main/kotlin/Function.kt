@@ -8,10 +8,15 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
     private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
     private val edges = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
 
+    companion object {
+        val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, TerminalNode>>>>()
+    }
+
     fun initPointers() {
         args.filter { it.first }.forEach {
             pointers.add(Pair(it.second, mutableSetOf()))
             edges.add(Pair(it.second, mutableSetOf()))
+            callEdges.add(Pair(it.second, mutableSetOf()))
         }
         variables.reversed().forEach {
             pointers.add(Pair(it, mutableSetOf()))
@@ -75,6 +80,12 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
             updatePts()
         }
         updatePts()
+    }
+
+    fun checkCall(){
+        calls.forEach {
+
+        }
     }
 
     private fun updatePts() {

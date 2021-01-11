@@ -2,16 +2,16 @@ import clang.ClangBaseListener
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener() {
+class WalkListener : ClangBaseListener() {
     override fun enterAssignmentExpression(ctx: ClangParser.AssignmentExpressionContext?) {
         super.enterAssignmentExpression(ctx)
         if (ctx?.assignmentOperator()?.text == "=")
-            funcs.last().expressions.add(ctx)
+            functions.last().expressions.add(ctx)
     }
 
     override fun enterInitDeclaratorList(ctx: ClangParser.InitDeclaratorListContext?) {
         super.enterInitDeclaratorList(ctx)
-        ctx?.initDeclarator()?.declarator()?.directDeclarator()?.Identifier()?.let { funcs.last().variables.add(it) }
+        ctx?.initDeclarator()?.declarator()?.directDeclarator()?.Identifier()?.let { functions.last().variables.add(it) }
     }
 
     override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {
@@ -30,7 +30,7 @@ class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener
                     })
                 arg = arg.parameterList()
             }
-            funcs.add(Function(it.text, list.reversed()))
+            functions.add(Function(it.text, list.reversed()))
         }
     }
 
@@ -43,7 +43,7 @@ class WalkListener(private val funcs: MutableList<Function>) : ClangBaseListener
                 list.add(arg.assignmentExpression())
                 arg = arg.argumentExpressionList()
             }
-            funcs.last().calls.add(Call(it.text, list.reversed()))
+            functions.last().calls.add(Call(it.text, list.reversed()))
         }
     }
 }

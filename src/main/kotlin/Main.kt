@@ -20,6 +20,9 @@ fun main(args: Array<String>) {
     functions.forEach {
         it.initPointers()
         it.checkExpr()
+    }
+    functions.forEach {
+        it.updateForCall()
         it.print()
     }
 }

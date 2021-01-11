@@ -112,6 +112,20 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
         }
     }
 
+    fun updateForCall() {
+        callEdges.forEach {
+            pointers.find { p -> p.first.text == it.first.text }?.let { p ->
+                it.second.forEach { s ->
+                    p.second.add(s.second)
+                    p.second.addAll(
+                        functions.find { f -> f.name == s.first }?.pointers?.find { fp -> fp.first.text == s.second.text }?.second
+                            ?: emptySet()
+                    )
+                }
+            }
+        }
+    }
+
     fun print() {
         println("$name ${args.map { (if (it.first) "*" else "") + it.second.text }}")
         expressions.forEach {

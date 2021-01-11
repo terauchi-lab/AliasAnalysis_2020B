@@ -7,10 +7,8 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
     val calls = mutableListOf<Call>()
     private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
     private val edges = mutableListOf<Pair<TerminalNode, MutableSet<TerminalNode>>>()
+    val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, TerminalNode>>>>()
 
-    companion object {
-        val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, TerminalNode>>>>()
-    }
 
     fun initPointers() {
         args.filter { it.first }.forEach {
@@ -80,11 +78,25 @@ class Function(val name: String, val args: List<Pair<Boolean, TerminalNode>>) {
             updatePts()
         }
         updatePts()
+        checkCall()
     }
 
-    fun checkCall(){
+    private fun checkCall() {
         calls.forEach {
-
+            functions.find { f -> f.name == it.name }?.let { f ->
+                f.args.filter { a -> a.first }.forEach { a ->
+                    f.callEdges.find { c -> c.first.text == a.second.text }?.second?.add(
+                        Pair(
+                            name,
+                            it.args[f.args.indexOf(a)].conditionalExpression().logicalOrExpression()
+                                .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression().andExpression()
+                                .equalityExpression().relationalExpression().shiftExpression().additiveExpression()
+                                .multiplicativeExpression().castExpression().unaryExpression().castExpression()
+                                .unaryExpression().postfixExpression().primaryExpression().Identifier()
+                        )
+                    )
+                }
+            }
         }
     }
 

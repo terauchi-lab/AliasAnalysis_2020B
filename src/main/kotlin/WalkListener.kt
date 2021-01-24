@@ -11,7 +11,8 @@ class WalkListener : ClangBaseListener() {
 
     override fun enterInitDeclaratorList(ctx: ClangParser.InitDeclaratorListContext?) {
         super.enterInitDeclaratorList(ctx)
-        ctx?.initDeclarator()?.declarator()?.directDeclarator()?.Identifier()?.let { functions.last().variables.add(it) }
+        ctx?.initDeclarator()?.declarator()?.directDeclarator()?.Identifier()
+            ?.let { functions.last().variables.add(it) }
     }
 
     override fun enterExternalDeclaration(ctx: ClangParser.ExternalDeclarationContext?) {
@@ -30,7 +31,14 @@ class WalkListener : ClangBaseListener() {
                     })
                 arg = arg.parameterList()
             }
-            functions.add(Function(it.text, list.reversed()))
+            functions.add(
+                Function(
+                    it.text,
+                    list.reversed(),
+                    ctx.functionDefinition()?.declarationSpecifiers()?.declarationSpecifier()?.last()?.typeSpecifier()
+                        ?.pointer() != null
+                )
+            )
         }
     }
 

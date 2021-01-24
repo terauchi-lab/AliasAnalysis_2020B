@@ -1,7 +1,7 @@
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class Function(private val name: String, private val args: List<Pair<Boolean, TerminalNode>>) {
+class Function(private val name: String, private val args: List<Pair<Boolean, TerminalNode>>, val isPointer: Boolean) {
     val variables = mutableSetOf<TerminalNode>()
     val expressions = mutableListOf<ClangParser.AssignmentExpressionContext>()
     val calls = mutableListOf<Call>()
@@ -126,7 +126,7 @@ class Function(private val name: String, private val args: List<Pair<Boolean, Te
     }
 
     fun print() {
-        println("$name ${args.map { (if (it.first) "*" else "") + it.second.text }}")
+        println("${if (isPointer) "*" else ""}$name ${args.map { (if (it.first) "*" else "") + it.second.text }}")
         expressions.forEach {
             println("\t${it.text}")
         }

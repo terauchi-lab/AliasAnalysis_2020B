@@ -54,4 +54,16 @@ class WalkListener : ClangBaseListener() {
             functions.last().calls.add(Call(it.text, list.reversed()))
         }
     }
+
+    override fun enterJumpStatement(ctx: ClangParser.JumpStatementContext?) {
+        super.enterJumpStatement(ctx)
+        if (ctx?.Return() != null) {
+            functions.last().returnVariable =
+                ctx.expression().assignmentExpression().conditionalExpression().logicalOrExpression()
+                    .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression().andExpression()
+                    .equalityExpression().relationalExpression().shiftExpression().additiveExpression()
+                    .multiplicativeExpression().castExpression().unaryExpression().postfixExpression()
+                    .primaryExpression().Identifier().text
+        }
+    }
 }

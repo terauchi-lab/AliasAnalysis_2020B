@@ -1,6 +1,6 @@
 int *pt(){
     int a,d;
-    return &a;
+    return a;
 }
 
 int main(){

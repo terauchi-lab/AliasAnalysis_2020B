@@ -1,13 +1,19 @@
 import clang.ClangParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-class Function(private val name: String, private val args: List<Pair<Boolean, TerminalNode>>, val isPointer: Boolean) {
+class Function(
+    private val name: String,
+    private val args: List<Pair<Boolean, TerminalNode>>,
+    private val isPointer: Boolean
+) {
     val variables = mutableSetOf<TerminalNode>()
     val expressions = mutableListOf<ClangParser.AssignmentExpressionContext>()
     val calls = mutableListOf<Call>()
+    var returnVariable: String? = null
     private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<String>>>()
     private val edges = mutableListOf<Pair<TerminalNode, MutableSet<String>>>()
     private val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, String>>>>()
+    private val returnEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, String>>>>()
 
     fun initPointers() {
         args.filter { it.first }.forEach {
@@ -18,6 +24,7 @@ class Function(private val name: String, private val args: List<Pair<Boolean, Te
         variables.reversed().forEach {
             pointers.add(Pair(it, mutableSetOf()))
             edges.add(Pair(it, mutableSetOf()))
+            returnEdges.add(Pair(it, mutableSetOf()))
         }
     }
 

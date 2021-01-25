@@ -21,8 +21,13 @@ fun main(args: Array<String>) {
         it.initPointers()
         it.checkExpr()
     }
+    repeat(functions.size) {
+        functions.forEach {
+            it.updateForCall()
+            it.updatePts()
+        }
+    }
     functions.forEach {
-        it.updateForCall()
         it.print()
     }
 }

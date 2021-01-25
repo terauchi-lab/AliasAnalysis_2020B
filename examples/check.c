@@ -1,6 +1,5 @@
-int *pt(){
-    int a,d;
-    return a;
+int *pt(int *x,int *y){
+    return x;
 }
 
 int main(){
@@ -8,5 +7,5 @@ int main(){
     p = &a;
     q = p;
     p = &b;
-    r = p;
+    r = pt(p,b);
 }

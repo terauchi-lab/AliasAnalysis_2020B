@@ -60,8 +60,24 @@ class Function(
                             }
                         }
                         null -> {
+                            //a=b();
+                            if (c?.postfixExpression()?.postfixExpression() != null) {
+                                functions.find { f ->
+                                    f.name == c.postfixExpression().postfixExpression().primaryExpression()
+                                        .Identifier().text
+                                }?.let { f ->
+                                    if (f.isPointer) {
+                                        callEdges.find { c ->
+                                            c.first.text == it.unaryExpression().postfixExpression().primaryExpression()
+                                                .Identifier().text
+                                        }?.second?.add(
+                                            Pair(f.name, f.returnVariable ?: "null")
+                                        )
+                                    }
+                                }
+                            }
                             //a=b;
-                            if (it.unaryExpression()?.unaryOperator() == null) {
+                            else if (it.unaryExpression()?.unaryOperator() == null) {
                                 edges.find { e ->
                                     e.first.text == it.unaryExpression().postfixExpression().primaryExpression()
                                         .Identifier().text
@@ -97,8 +113,17 @@ class Function(
                             it.args[f.args.indexOf(a)].conditionalExpression().logicalOrExpression()
                                 .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression().andExpression()
                                 .equalityExpression().relationalExpression().shiftExpression().additiveExpression()
-                                .multiplicativeExpression().castExpression().unaryExpression().castExpression()
-                                .unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                .multiplicativeExpression().castExpression().unaryExpression().castExpression().run {
+                                    if (this != null)
+                                        unaryExpression().postfixExpression().primaryExpression().Identifier().text
+                                    else it.args[f.args.indexOf(a)].conditionalExpression().logicalOrExpression()
+                                        .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression()
+                                        .andExpression()
+                                        .equalityExpression().relationalExpression().shiftExpression()
+                                        .additiveExpression()
+                                        .multiplicativeExpression().castExpression().unaryExpression()
+                                        .postfixExpression().primaryExpression().Identifier().text
+                                }
                         )
                     )
                 }
@@ -106,7 +131,7 @@ class Function(
         }
     }
 
-    private fun updatePts() {
+    fun updatePts() {
         edges.forEach {
             it.second.forEach { s ->
                 pointers.find { p ->

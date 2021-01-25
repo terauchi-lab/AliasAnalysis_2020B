@@ -13,7 +13,6 @@ class Function(
     private val pointers = mutableListOf<Pair<TerminalNode, MutableSet<String>>>()
     private val edges = mutableListOf<Pair<TerminalNode, MutableSet<String>>>()
     private val callEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, String>>>>()
-    private val returnEdges = mutableListOf<Pair<TerminalNode, MutableSet<Pair<String, String>>>>()
 
     fun initPointers() {
         args.filter { it.first }.forEach {
@@ -24,7 +23,7 @@ class Function(
         variables.reversed().forEach {
             pointers.add(Pair(it, mutableSetOf()))
             edges.add(Pair(it, mutableSetOf()))
-            returnEdges.add(Pair(it, mutableSetOf()))
+            callEdges.add(Pair(it, mutableSetOf()))
         }
     }
 
@@ -113,16 +112,10 @@ class Function(
                             it.args[f.args.indexOf(a)].conditionalExpression().logicalOrExpression()
                                 .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression().andExpression()
                                 .equalityExpression().relationalExpression().shiftExpression().additiveExpression()
-                                .multiplicativeExpression().castExpression().unaryExpression().castExpression().run {
-                                    if (this != null)
-                                        unaryExpression().postfixExpression().primaryExpression().Identifier().text
-                                    else it.args[f.args.indexOf(a)].conditionalExpression().logicalOrExpression()
-                                        .logicalAndExpression().inclusiveOrExpression().exclusiveOrExpression()
-                                        .andExpression()
-                                        .equalityExpression().relationalExpression().shiftExpression()
-                                        .additiveExpression()
-                                        .multiplicativeExpression().castExpression().unaryExpression()
+                                .multiplicativeExpression().castExpression().unaryExpression().run {
+                                    if (this.castExpression() != null) castExpression().unaryExpression()
                                         .postfixExpression().primaryExpression().Identifier().text
+                                    else postfixExpression().primaryExpression().Identifier().text
                                 }
                         )
                     )
